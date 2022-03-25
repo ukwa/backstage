@@ -1,8 +1,8 @@
-FROM ruby:2.5.3
+FROM ruby:2.6.9
 
 RUN gem install rails -v 5
 
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs
 RUN gem install bundler
 

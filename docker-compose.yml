@@ -7,9 +7,13 @@ services:
   # ----------------------------------------
 
   backstage:
-    build: .
+    build:
+      context: .
+      args:
+        http_proxy: ${HTTP_PROXY}
+        https_proxy: ${HTTPS_PROXY}
     environment:
-     - "SOLR_URL=http://trackdb:8983/solr/tracking"
+     - "CATALOG_SOLR_URL=http://warc-solr:8983/solr/discovery"
      - "TRACKDB_SOLR_URL=http://trackdb:8983/solr/tracking"
     ports:
      - 3000:3000
