@@ -4,6 +4,7 @@ class MementosController < CatalogController
   before_action :configure_solr_url
 
   def configure_solr_url
+    logger.info("Setting up Mementos Solr connection.")
     blacklight_config.connection_config[:url] = ENV['CATALOG_SOLR_URL'] || "http://catalog:8983/solr/catalog"
   end
 

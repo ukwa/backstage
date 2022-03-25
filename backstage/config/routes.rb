@@ -4,9 +4,9 @@ Rails.application.routes.draw do
 
   mount Blacklight::Engine => '/'
   concern :marc_viewable, Blacklight::Marc::Routes::MarcViewable.new
-  root to: "mementos#index"
   concern :searchable, Blacklight::Routes::Searchable.new
   concern :exportable, Blacklight::Routes::Exportable.new
+  root to: "mementos#index"
 
   devise_for :users
 
