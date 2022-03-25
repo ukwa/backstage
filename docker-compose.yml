@@ -33,9 +33,9 @@ services:
     image: solr:8.3-slim
     #ports:
     #  - 8983:8983
-    volumes:
-      - ./docker/trackdb/var:/var/solr
-      - ./docker/trackdb/mycores:/opt/solr/server/solr/mycores
+    #volumes:
+    #  - ./docker/trackdb/var:/var/solr
+    #  - ./docker/trackdb/mycores:/opt/solr/server/solr/mycores
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate

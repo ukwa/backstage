@@ -1,3 +1,5 @@
+# This shared class called Catalog is used to pool common config and ensures we use the 'catalog' views.
+
 # frozen_string_literal: true
 class CatalogController < ApplicationController
 
@@ -11,12 +13,6 @@ class CatalogController < ApplicationController
   # Disable login for this controller:
   def has_user_authentication_provider?
     return false
-  end
-
-  before_action :configure_solr_url
-
-  def configure_solr_url
-    blacklight_config.connection_config[:url] = ENV['CATALOG_SOLR_URL'] || "http://catalog:8983/solr/catalog"
   end
 
   configure_blacklight do |config|
@@ -48,7 +44,7 @@ class CatalogController < ApplicationController
     #config.per_page = [10,20,50,100]
 
     # solr field configuration for search results/index views
-    config.index.title_field = 'title'
+    #config.index.title_field = 'title'
     #config.index.display_type_field = 'format'
     #config.index.thumbnail_field = 'thumbnail_path_ss'
 
@@ -63,8 +59,8 @@ class CatalogController < ApplicationController
     #config.add_show_tools_partial(:sms, if: :render_sms_action?, callback: :sms_action, validator: :validate_sms_params)
     #config.add_show_tools_partial(:citation)
 
-    config.add_nav_action(:catalog, partial: 'backstage/nav/catalog')
-    config.add_nav_action(:trackdb, partial: 'backstage/nav/trackdb')
+    config.add_nav_action(:mementos, partial: 'backstage/nav/mementos', label: 'Mementos')
+    config.add_nav_action(:trackdb, partial: 'backstage/nav/trackdb', label: 'Files')
     #config.add_nav_action(:bookmark, partial: 'blacklight/nav/bookmark', if: :render_bookmarks_control?)
     #config.add_nav_action(:search_history, partial: 'blacklight/nav/search_history')
 
@@ -98,12 +94,12 @@ class CatalogController < ApplicationController
     # :index_range can be an array or range of prefixes that will be used to create the navigation (note: It is case sensitive when searching values)
 
     #config.add_facet_field 'stream_s', label: 'Stream'
-    config.add_facet_field 'crawl_year', label: 'Crawl Year', single: true
+    #config.add_facet_field 'crawl_year', label: 'Crawl Year', single: true
     #config.add_facet_field 'subject_ssim', label: 'Topic', limit: 20, index_range: 'A'..'Z'
     #config.add_facet_field 'language_ssim', label: 'Language', limit: true
-    config.add_facet_field 'type', label: 'Type'
-    config.add_facet_field 'access_terms', label: 'Access Terms'
-    config.add_facet_field 'domain', label: 'Domain'
+    #config.add_facet_field 'type', label: 'Type'
+    #config.add_facet_field 'access_terms', label: 'Access Terms'
+    #config.add_facet_field 'domain', label: 'Domain'
 
     #config.add_facet_field 'example_pivot_field', label: 'Pivot Field', :pivot => ['format', 'language_ssim']
 
@@ -121,17 +117,17 @@ class CatalogController < ApplicationController
 
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display
-    config.add_index_field 'id', label: 'ID'
-    config.add_index_field 'title', label: 'Title'
-    config.add_index_field 'url', label: 'URL'
-    config.add_index_field 'crawl_date', label: 'Crawl Date'
+    #config.add_index_field 'id', label: 'ID'
+    #config.add_index_field 'title', label: 'Title'
+    #config.add_index_field 'url', label: 'URL'
+    #config.add_index_field 'crawl_date', label: 'Crawl Date'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
-    config.add_show_field 'id', label: 'ID'
-    config.add_show_field 'title', label: 'Title'
-    config.add_show_field 'url', label: 'URL'
-    config.add_show_field 'crawl_date', label: 'Crawl Date'
+    #config.add_show_field 'id', label: 'ID'
+    #config.add_show_field 'title', label: 'Title'
+    #config.add_show_field 'url', label: 'URL'
+    #config.add_show_field 'crawl_date', label: 'Crawl Date'
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields
@@ -151,32 +147,32 @@ class CatalogController < ApplicationController
     # solr request handler? The one set in config[:default_solr_parameters][:qt],
     # since we aren't specifying it otherwise.
 
-    config.add_search_field 'all_fields', label: 'All Fields' do |field|
-      field.solr_parameters = {
-        qf: ['title', 'content']
-      }
-    end
+    #config.add_search_field 'all_fields', label: 'All Fields' do |field|
+    #  field.solr_parameters = {
+    #    qf: ['title', 'content']
+    #  }
+    #end
 
     # Now we see how to over-ride Solr request handler defaults, in this
     # case for a BL "search field", which is really a dismax aggregate
     # of Solr search fields.
 
-    config.add_search_field('title', label: 'Title') do |field|
-      # solr_parameters hash are sent to Solr as ordinary url query params.
-      field.solr_parameters = {
-        'spellcheck.dictionary': 'title',
-        qf: 'title',
-        pf: 'title'
-      }
-    end
+    #config.add_search_field('title', label: 'Title') do |field|
+    #  # solr_parameters hash are sent to Solr as ordinary url query params.
+    #  field.solr_parameters = {
+    #    'spellcheck.dictionary': 'title',
+    #    qf: 'title',
+    #    pf: 'title'
+    #  }
+    #end
 
-    config.add_search_field('url', label: 'URL') do |field|
-      field.solr_parameters = {
-        'spellcheck.dictionary': 'url',
-        qf: 'url',
-        pf: 'url'
-      }
-    end
+    #config.add_search_field('url', label: 'URL') do |field|
+    #  field.solr_parameters = {
+    #    'spellcheck.dictionary': 'url',
+    #    qf: 'url',
+    #    pf: 'url'
+    #  }
+    #end
 
     # Specifying a :qt only to show it's possible, and so our internal automated
     # tests can test it. In this case it's the same as
@@ -194,9 +190,9 @@ class CatalogController < ApplicationController
     # label in pulldown is followed by the name of the SOLR field to sort by and
     # whether the sort is ascending or descending (it must be asc or desc
     # except in the relevancy case).
-    config.add_sort_field 'crawl_date desc', label: 'newest first'
-    config.add_sort_field 'crawl_date asc', label: 'oldest first'
-    config.add_sort_field 'score desc, timestamp_dt desc', label: 'relevance'
+    #config.add_sort_field 'crawl_date desc', label: 'newest first'
+    #config.add_sort_field 'crawl_date asc', label: 'oldest first'
+    #config.add_sort_field 'score desc, timestamp_dt desc', label: 'relevance'
     #config.add_sort_field 'pub_date_si desc, title_si asc', label: 'year'
     #config.add_sort_field 'author_si asc, title_si asc', label: 'author'
     #config.add_sort_field 'title_si asc, pub_date_si desc', label: 'title'

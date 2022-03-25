@@ -1,10 +1,10 @@
 # frozen_string_literal: true
-class TrackdbController < CatalogController
+class MementosController < CatalogController
 
   before_action :configure_solr_url
 
   def configure_solr_url
-    blacklight_config.connection_config[:url] = ENV['TRACKDB_SOLR_URL'] || "http://trackdb:8983/solr/trackdb"
+    blacklight_config.connection_config[:url] = ENV['CATALOG_SOLR_URL'] || "http://catalog:8983/solr/catalog"
   end
 
   configure_blacklight do |config|
@@ -36,15 +36,15 @@ class TrackdbController < CatalogController
     #config.per_page = [10,20,50,100]
 
     # solr field configuration for search results/index views
-    config.index.title_field = 'file_name_s'
+    config.index.title_field = 'title'
     #config.index.display_type_field = 'format'
     #config.index.thumbnail_field = 'thumbnail_path_ss'
 
     #config.add_results_document_tool(:bookmark, partial: 'bookmark_control', if: :render_bookmarks_control?)
 
-    config.add_results_collection_tool(:sort_widget)
-    config.add_results_collection_tool(:per_page_widget)
-    config.add_results_collection_tool(:view_type_group)
+    #config.add_results_collection_tool(:sort_widget)
+    #config.add_results_collection_tool(:per_page_widget)
+    #config.add_results_collection_tool(:view_type_group)
 
     #config.add_show_tools_partial(:bookmark, partial: 'bookmark_control', if: :render_bookmarks_control?)
     #config.add_show_tools_partial(:email, callback: :email_action, validator: :validate_email_params)
@@ -83,13 +83,13 @@ class TrackdbController < CatalogController
     #  (useful when user clicks "more" on a large facet and wants to navigate alphabetically across a large set of results)
     # :index_range can be an array or range of prefixes that will be used to create the navigation (note: It is case sensitive when searching values)
 
-    config.add_facet_field 'stream_s', label: 'Stream'
-    config.add_facet_field 'year_i', label: 'Year', single: true
+    #config.add_facet_field 'stream_s', label: 'Stream'
+    config.add_facet_field 'crawl_year', label: 'Crawl Year', single: true
     #config.add_facet_field 'subject_ssim', label: 'Topic', limit: 20, index_range: 'A'..'Z'
     #config.add_facet_field 'language_ssim', label: 'Language', limit: true
-    config.add_facet_field 'collection_s', label: 'Collection'
-    config.add_facet_field 'kind_s', label: 'Kind'
-    config.add_facet_field 'job_s', label: 'Job'
+    config.add_facet_field 'type', label: 'Type'
+    config.add_facet_field 'access_terms', label: 'Access Terms'
+    config.add_facet_field 'domain', label: 'Domain'
 
     #config.add_facet_field 'example_pivot_field', label: 'Pivot Field', :pivot => ['format', 'language_ssim']
 
@@ -108,16 +108,16 @@ class TrackdbController < CatalogController
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display
     config.add_index_field 'id', label: 'ID'
-    config.add_index_field 'file_name_s', label: 'File name'
-    config.add_index_field 'file_path_s', label: 'File path'
-    config.add_index_field 'file_size_s', label: 'File size'
+    config.add_index_field 'title', label: 'Title'
+    config.add_index_field 'url', label: 'URL'
+    config.add_index_field 'crawl_date', label: 'Crawl Date'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
     config.add_show_field 'id', label: 'ID'
-    config.add_show_field 'file_name_s', label: 'File name'
-    config.add_show_field 'file_path_s', label: 'File path'
-    config.add_show_field 'file_size_s', label: 'File size'
+    config.add_show_field 'title', label: 'Title'
+    config.add_show_field 'url', label: 'URL'
+    config.add_show_field 'crawl_date', label: 'Crawl Date'
 
     # "fielded" search configuration. Used by pulldown among other places.
     # For supported keys in hash, see rdoc for Blacklight::SearchFields
@@ -139,7 +139,7 @@ class TrackdbController < CatalogController
 
     config.add_search_field 'all_fields', label: 'All Fields' do |field|
       field.solr_parameters = {
-        qf: ['file_name_s', 'file_path_s']
+        qf: ['title', 'content']
       }
     end
 
@@ -147,20 +147,20 @@ class TrackdbController < CatalogController
     # case for a BL "search field", which is really a dismax aggregate
     # of Solr search fields.
 
-    config.add_search_field('file_name', label: 'Filename') do |field|
+    config.add_search_field('title', label: 'Title') do |field|
       # solr_parameters hash are sent to Solr as ordinary url query params.
       field.solr_parameters = {
-        'spellcheck.dictionary': 'file_name_s',
-        qf: 'file_name_s',
-        pf: 'file_name_s'
+        'spellcheck.dictionary': 'title',
+        qf: 'title',
+        pf: 'title'
       }
     end
 
-    config.add_search_field('file_path') do |field|
+    config.add_search_field('url', label: 'URL') do |field|
       field.solr_parameters = {
-        'spellcheck.dictionary': 'file_path_s',
-        qf: 'file_path_s',
-        pf: 'file_path_s'
+        'spellcheck.dictionary': 'url',
+        qf: 'url',
+        pf: 'url'
       }
     end
 
@@ -180,8 +180,8 @@ class TrackdbController < CatalogController
     # label in pulldown is followed by the name of the SOLR field to sort by and
     # whether the sort is ascending or descending (it must be asc or desc
     # except in the relevancy case).
-    config.add_sort_field 'timestamp_dt desc', label: 'newest first'
-    config.add_sort_field 'timestamp_dt asc', label: 'oldest first'
+    config.add_sort_field 'crawl_date desc', label: 'newest first'
+    config.add_sort_field 'crawl_date asc', label: 'oldest first'
     config.add_sort_field 'score desc, timestamp_dt desc', label: 'relevance'
     #config.add_sort_field 'pub_date_si desc, title_si asc', label: 'year'
     #config.add_sort_field 'author_si asc, title_si asc', label: 'author'

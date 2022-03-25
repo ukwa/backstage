@@ -4,31 +4,32 @@ Rails.application.routes.draw do
 
   mount Blacklight::Engine => '/'
   concern :marc_viewable, Blacklight::Marc::Routes::MarcViewable.new
-  root to: "catalog#index"
+  root to: "mementos#index"
   concern :searchable, Blacklight::Routes::Searchable.new
+  concern :exportable, Blacklight::Routes::Exportable.new
+
+  devise_for :users
 
   # TrackDB
 
   resource :trackdb, only: [:index], as: 'trackdb', path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ } do
     concerns :searchable
   end
-  concern :exportable, Blacklight::Routes::Exportable.new
 
   # No format guessing as extensions are part of the IDs, see https://stackoverflow.com/a/57895695
-  resources :solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ }, format: false, defaults: {format: 'html'} do
+  #resources :solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ }, format: false, defaults: {format: 'text/html'} do
+  resources :trackdb_solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/, format: false } do
     concerns :exportable
   end
 
-  # Catalog
+  # Mementos
 
-  resource :catalog, only: [:index], as: 'catalog', path: '/catalog', controller: 'catalog', constraints: { id: /.+/ } do
+  resource :mementos, only: [:index], as: 'mementos', path: '/mementos', controller: 'mementos', constraints: { id: /.+/ } do
     concerns :searchable
   end
-  devise_for :users
-  concern :exportable, Blacklight::Routes::Exportable.new
 
-  resources :solr_documents, only: [:show], path: '/catalog', controller: 'catalog', constraints: { id: /.+/ } do
-    concerns [:exportable, :marc_viewable]
+  resources :mementos_solr_documents, only: [:show], path: '/mementos', controller: 'mementos', constraints: { id: /.+/, format: false } do
+    concerns :exportable
   end
 
   resources :bookmarks do
