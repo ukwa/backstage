@@ -15,7 +15,7 @@ Rails.application.routes.draw do
   concern :exportable, Blacklight::Routes::Exportable.new
 
   # No format guessing as extensions are part of the IDs, see https://stackoverflow.com/a/57895695
-  resources :solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ }, format: false, defaults: {format: 'html'}, do
+  resources :solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ }, format: false, defaults: {format: 'html'} do
     concerns :exportable
   end
 

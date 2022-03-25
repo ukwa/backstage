@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 class CatalogController < ApplicationController
 
+  # Adds a few additional behaviors into the application controller
+  include Blacklight::Controller
+  layout :determine_layout if respond_to? :layout
+
   include Blacklight::Catalog
   include Blacklight::Marc::Catalog
   
@@ -60,6 +64,7 @@ class CatalogController < ApplicationController
     #config.add_show_tools_partial(:citation)
 
     config.add_nav_action(:catalog, partial: 'backstage/nav/catalog')
+    config.add_nav_action(:trackdb, partial: 'backstage/nav/trackdb')
     #config.add_nav_action(:bookmark, partial: 'blacklight/nav/bookmark', if: :render_bookmarks_control?)
     #config.add_nav_action(:search_history, partial: 'blacklight/nav/search_history')
 
