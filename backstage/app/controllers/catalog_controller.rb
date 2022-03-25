@@ -34,7 +34,9 @@ class CatalogController < ApplicationController
       rows: 10,
       defType: 'edismax',
       'q.alt': '*:*',
-      'facet.mincount': 1
+      'facet.mincount': 1,
+      # Show all results by default
+      'q': '*:*' 
     }
 
     # solr path which will be added to solr base url before the other solr params.
@@ -42,7 +44,7 @@ class CatalogController < ApplicationController
     #config.document_solr_path = 'get'
 
     # items to show per page, each number in the array represent another option to choose from.
-    #config.per_page = [10,20,50,100]
+    config.per_page = [10,20,50,100]
 
     # solr field configuration for search results/index views
     config.index.title_field = 'title'
@@ -51,9 +53,9 @@ class CatalogController < ApplicationController
 
     #config.add_results_document_tool(:bookmark, partial: 'bookmark_control', if: :render_bookmarks_control?)
 
-    #config.add_results_collection_tool(:sort_widget)
-    #config.add_results_collection_tool(:per_page_widget)
-    #config.add_results_collection_tool(:view_type_group)
+    config.add_results_collection_tool(:sort_widget)
+    config.add_results_collection_tool(:per_page_widget)
+    config.add_results_collection_tool(:view_type_group)
 
     #config.add_show_tools_partial(:bookmark, partial: 'bookmark_control', if: :render_bookmarks_control?)
     #config.add_show_tools_partial(:email, callback: :email_action, validator: :validate_email_params)
@@ -92,13 +94,16 @@ class CatalogController < ApplicationController
     #  (useful when user clicks "more" on a large facet and wants to navigate alphabetically across a large set of results)
     # :index_range can be an array or range of prefixes that will be used to create the navigation (note: It is case sensitive when searching values)
 
-    #config.add_facet_field 'stream_s', label: 'Stream'
-    config.add_facet_field 'crawl_year', label: 'Crawl Year', single: true
-    #config.add_facet_field 'subject_ssim', label: 'Topic', limit: 20, index_range: 'A'..'Z'
-    #config.add_facet_field 'language_ssim', label: 'Language', limit: true
-    config.add_facet_field 'type', label: 'Type'
-    config.add_facet_field 'access_terms', label: 'Access Terms'
-    config.add_facet_field 'domain', label: 'Domain'
+    config.add_facet_field 'access_terms', label: 'Access Terms', collapse: false
+    config.add_facet_field 'crawl_year', label: 'Crawl Year', collapse: false, sort: 'index'
+    config.add_facet_field 'type', label: 'Type', collapse: false
+    config.add_facet_field 'public_suffix', label: 'Public Suffix', collapse: false, limit: true
+    config.add_facet_field 'domain', label: 'Domain', limit: true
+    config.add_facet_field 'links_domains', label: 'Links Domains', limit: true
+    config.add_facet_field 'content_language', label: 'Content Language', limit: true
+    config.add_facet_field 'institution', label: 'Institution'
+    config.add_facet_field 'collection', label: 'Collection'
+    config.add_facet_field 'collection_id', label: 'Collection Id'
 
     #config.add_facet_field 'example_pivot_field', label: 'Pivot Field', :pivot => ['format', 'language_ssim']
 
@@ -116,10 +121,17 @@ class CatalogController < ApplicationController
 
     # solr fields to be displayed in the index (search results) view
     #   The ordering of the field names is the order of the display
-    config.add_index_field 'id', label: 'ID'
     config.add_index_field 'title', label: 'Title'
     config.add_index_field 'url', label: 'URL'
+    config.add_index_field 'host', label: 'Host', link_to_facet: true
     config.add_index_field 'crawl_date', label: 'Crawl Date'
+    config.add_index_field 'content_type_norm', label: 'General Content Type', link_to_facet: true
+    config.add_index_field 'content_language', label: 'Content Language', link_to_facet: true
+    config.add_index_field 'domain', label: 'Domain', link_to_facet: true
+    config.add_index_field 'institution', label: 'Institution', link_to_facet: true
+    config.add_index_field 'collection', label: 'Collection', link_to_facet: true
+    #config.add_index_field 'collection_id', label: 'Collection Id', link_to_facet: true
+    #config.add_index_field 'links_domains', label: 'This page links to', helper_method: :return_five
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display
