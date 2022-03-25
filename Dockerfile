@@ -1,4 +1,4 @@
-FROM ruby:2.6.9
+FROM ruby:2.6.8
 
 RUN gem install rails -v 5
 
