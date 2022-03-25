@@ -11,25 +11,27 @@ Rails.application.routes.draw do
   devise_for :users
 
   # TrackDB
+  scope '/trackdb' do
+    resource :catalog, only: [:index], as: 'trackdb', path: '/', controller: 'trackdb', constraints: { id: /.+/ } do
+      concerns :searchable
+    end
 
-  resource :trackdb, only: [:index], as: 'trackdb', path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ } do
-    concerns :searchable
-  end
-
-  # No format guessing as extensions are part of the IDs, see https://stackoverflow.com/a/57895695
-  #resources :solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ }, format: false, defaults: {format: 'text/html'} do
-  resources :trackdb_solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/, format: false } do
-    concerns :exportable
+    # No format guessing as extensions are part of the IDs, see https://stackoverflow.com/a/57895695
+    #resources :solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ }, format: false, defaults: {format: 'text/html'} do
+    resources :solr_documents, only: [:show], path: '/', controller: 'trackdb', constraints: { id: /.+/, format: false } do
+      concerns :exportable
+    end
   end
 
   # Mementos
+  scope '/mementos' do
+    resource :catalog, only: [:index], as: 'mementos', path: '/', controller: 'mementos', constraints: { id: /.+/ } do
+      concerns :searchable
+    end
 
-  resource :mementos, only: [:index], as: 'mementos', path: '/mementos', controller: 'mementos', constraints: { id: /.+/ } do
-    concerns :searchable
-  end
-
-  resources :mementos_solr_documents, only: [:show], path: '/mementos', controller: 'mementos', constraints: { id: /.+/, format: false } do
-    concerns :exportable
+    resources :solr_documents, only: [:show], path: '/', controller: 'mementos', constraints: { id: /.+/, format: false } do
+      concerns :exportable
+    end
   end
 
   resources :bookmarks do
