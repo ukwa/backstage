@@ -6,30 +6,19 @@ Rails.application.routes.draw do
   concern :marc_viewable, Blacklight::Marc::Routes::MarcViewable.new
   concern :searchable, Blacklight::Routes::Searchable.new
   concern :exportable, Blacklight::Routes::Exportable.new
-  root to: "mementos#index"
+  root to: "catalog#index"
 
   devise_for :users
 
-  # TrackDB
-  scope '/trackdb' do
-    resource :catalog, only: [:index], as: 'trackdb', path: '/', controller: 'trackdb', constraints: { id: /.+/ } do
+  # Search
+  scope '/search' do
+    resource :catalog, only: [:index], as: 'catalog', path: '/', controller: 'catalog', constraints: { id: /.+/ } do
       concerns :searchable
     end
 
     # No format guessing as extensions are part of the IDs, see https://stackoverflow.com/a/57895695
-    #resources :solr_documents, only: [:show], path: '/trackdb', controller: 'trackdb', constraints: { id: /.+/ }, format: false, defaults: {format: 'text/html'} do
-    resources :solr_documents, only: [:show], path: '/', controller: 'trackdb', constraints: { id: /.+/, format: false } do
-      concerns :exportable
-    end
-  end
-
-  # Mementos
-  scope '/mementos' do
-    resource :catalog, only: [:index], as: 'mementos', path: '/', controller: 'mementos', constraints: { id: /.+/ } do
-      concerns :searchable
-    end
-
-    resources :solr_documents, only: [:show], path: '/', controller: 'mementos', constraints: { id: /.+/, format: false } do
+    #resources :solr_documents, only: [:show], path: '/catalog', controller: 'catalog', constraints: { id: /.+/ }, format: false, defaults: {format: 'text/html'} do
+    resources :solr_documents, only: [:show], path: '/', controller: 'catalog', constraints: { id: /.+/, format: false } do
       concerns :exportable
     end
   end

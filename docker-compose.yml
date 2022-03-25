@@ -13,8 +13,7 @@ services:
         http_proxy: ${HTTP_PROXY}
         https_proxy: ${HTTPS_PROXY}
     environment:
-     - "CATALOG_SOLR_URL=http://warc-solr:8983/solr/discovery"
-     - "TRACKDB_SOLR_URL=http://trackdb:8983/solr/tracking"
+     - "SOLR_URL=http://warc-solr:8983/solr/discovery"
     ports:
      - 3000:3000
 
@@ -27,17 +26,4 @@ services:
     image: ukwa/webarchive-discovery-solr
     ports:
       - 8984:8983
-
-  # Was stuck on 7.7 until https://issues.apache.org/jira/browse/SOLR-13523 is resolved in >= 8.1.2
-  trackdb:
-    image: solr:8.3-slim
-    #ports:
-    #  - 8983:8983
-    #volumes:
-    #  - ./docker/trackdb/var:/var/solr
-    #  - ./docker/trackdb/mycores:/opt/solr/server/solr/mycores
-    entrypoint:
-      - docker-entrypoint.sh
-      - solr-precreate
-      - tracking
 
